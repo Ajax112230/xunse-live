@@ -1,0 +1,1956 @@
+<!DOCTYPE html>
+<!-- v=20260702-3mode -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>中国传统色 · 寻色</title>
+<meta name="description" content="160种中国传统色，每一色都有诗。设计师配色灵感工具。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=ZCOOL+QingKe+HuangYou&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════
+   中国传统色 · 寻色 — 色彩浏览器
+   ═══════════════════════════════════════════════ */
+
+:root {
+  --bg: #0d0d0d;
+  --bg-card: #141414;
+  --gold: #c9a96e;
+  --gold-light: #e0c98a;
+  --text: rgba(255,255,255,0.87);
+  --text-secondary: rgba(255,255,255,0.55);
+  --text-muted: rgba(255,255,255,0.28);
+  --border: rgba(255,255,255,0.06);
+  --radius: 16px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Noto Serif SC', 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+/* ─── Canvas 背景 ─────────────────────────────── */
+#galaxy-bg {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+#galaxy-bg canvas {
+  display: block;
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+}
+
+/* ─── 主容器 ──────────────────────────────────── */
+.app {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ─── Hero ────────────────────────────────────── */
+.hero {
+  text-align: center;
+  padding: 80px 0 48px;
+}
+
+.hero h1 {
+  font-family: 'ZCOOL QingKe HuangYou', 'Noto Serif SC', serif;
+  font-size: clamp(48px, 8vw, 88px);
+  background: linear-gradient(180deg, #e8c97a 0%, #c9a96e 40%, #8b6d3f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 0.08em;
+  margin-bottom: 12px;
+}
+
+.hero .subtitle {
+  font-size: 15px;
+  color: var(--text-secondary);
+  letter-spacing: 0.15em;
+  margin-bottom: 36px;
+}
+
+/* ─── 搜索 ────────────────────────────────────── */
+.search-wrap {
+  position: relative;
+  max-width: 420px;
+  margin: 0 auto 32px;
+}
+
+.search-wrap input {
+  width: 100%;
+  padding: 14px 48px 14px 20px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 50px;
+  color: var(--text);
+  font-size: 15px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.search-wrap input:focus {
+  border-color: rgba(201,169,110,0.4);
+  box-shadow: 0 0 0 3px rgba(201,169,110,0.08);
+}
+
+.search-wrap input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-wrap .search-icon {
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 18px;
+  pointer-events: none;
+}
+
+/* ─── 模式切换 ────────────────────────────────── */
+.mode-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-bottom: 24px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 50px;
+  padding: 4px;
+  max-width: 380px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 50px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.mode-btn.active {
+  background: rgba(201,169,110,0.15);
+  color: var(--gold-light);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* ─── 姓色匹配 - 输入区 ──────────────────────── */
+#name-screen {
+  display: none;
+  text-align: center;
+  padding: 0 0 32px;
+}
+
+#name-screen.active {
+  display: block;
+}
+
+.name-input-row {
+  display: flex;
+  max-width: 360px;
+  margin: 0 auto 12px;
+  border: 1px solid rgba(201,169,110,0.35);
+  border-radius: 50px;
+  overflow: hidden;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.name-input-row:focus-within {
+  border-color: rgba(201,169,110,0.7);
+  box-shadow: 0 0 0 4px rgba(201,169,110,0.08);
+}
+
+.name-input-row input {
+  flex: 1;
+  padding: 14px 20px;
+  background: rgba(255,255,255,0.04);
+  border: none;
+  color: var(--text);
+  font-size: 16px;
+  font-family: inherit;
+  outline: none;
+}
+
+.name-input-row input::placeholder {
+  color: var(--text-muted);
+}
+
+.name-input-row button {
+  padding: 14px 24px;
+  background: rgba(201,169,110,0.15);
+  border: none;
+  border-left: 1px solid rgba(201,169,110,0.2);
+  color: var(--gold-light);
+  font-size: 16px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.25s;
+}
+
+.name-input-row button:hover {
+  background: rgba(201,169,110,0.28);
+}
+
+.name-input-row button:active {
+  background: rgba(201,169,110,0.35);
+}
+
+.name-hint {
+  font-size: 13px;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+.name-hint.shake {
+  animation: shake 0.5s cubic-bezier(0.16,1,0.3,1);
+}
+
+/* ─── 姓色匹配 - 结果区 ──────────────────────── */
+#name-result {
+  display: none;
+  text-align: center;
+  padding: 60px 0 80px;
+  position: relative;
+}
+
+#name-result.visible {
+  display: block;
+  animation: fadeInUp 0.6s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+/* 浮窗卡片：半透明暗底玻璃态 */
+.name-float-card {
+  display: inline-block;
+  background: rgba(10,10,10,0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 20px 28px;
+  margin-bottom: 20px;
+  max-width: 460px;
+}
+
+.name-result-poem {
+  max-width: 460px;
+  margin: 0 auto 24px;
+  padding: 20px 24px;
+  background: rgba(10,10,10,0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  border-left: 2px solid rgba(201,169,110,0.3);
+}
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* 圆形绣绷色卡 */
+.embroidery-card {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  margin: 0 auto 24px;
+  position: relative;
+  box-shadow:
+    0 0 0 6px #3a2e1a,
+    0 0 0 10px #1a140a,
+    0 0 0 14px rgba(201,169,110,0.3),
+    0 0 60px var(--ink-glow, rgba(201,169,110,0.3)),
+    inset 0 0 30px rgba(0,0,0,0.3);
+  background: var(--ink-color, #c9a96e);
+  transition: transform 0.6s cubic-bezier(0.16,1,0.3,1);
+  cursor: default;
+}
+
+.embroidery-card:hover {
+  transform: scale(1.04);
+}
+
+/* 丝绸纹理 */
+.embroidery-card::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 2; border-radius: 50%;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(15deg, transparent 0, transparent 2px, rgba(255,255,255,0.05) 2px, rgba(255,255,255,0.05) 2.4px),
+    repeating-linear-gradient(-12deg, transparent 0, transparent 4px, rgba(255,255,255,0.03) 4px, rgba(255,255,255,0.03) 4.3px),
+    linear-gradient(140deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.06) 18%, transparent 40%, transparent 75%, rgba(255,255,255,0.03) 100%),
+    radial-gradient(ellipse 45% 35% at 35% 25%, rgba(255,255,255,0.08) 0%, transparent 60%);
+}
+
+/* 织物纹理 */
+.embroidery-card::after {
+  content: '';
+  position: absolute; inset: 0; z-index: 3; border-radius: 50%;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(0deg, transparent 0, transparent 0.6px, rgba(255,255,255,0.012) 0.6px, rgba(255,255,255,0.012) 1px),
+    repeating-linear-gradient(90deg, transparent 0, transparent 0.6px, rgba(255,255,255,0.008) 0.6px, rgba(255,255,255,0.008) 1px);
+}
+
+.name-result-name {
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+
+.name-result-values {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.name-result-poem .poem-line {
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--text);
+}
+
+.name-result-poem .poem-attr {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 10px;
+  text-align: right;
+}
+
+.name-retry-btn {
+  display: inline-block;
+  padding: 12px 32px;
+  background: rgba(201,169,110,0.12);
+  border: 1px solid rgba(201,169,110,0.3);
+  border-radius: 50px;
+  color: var(--gold-light);
+  font-size: 15px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+.name-retry-btn:hover {
+  background: rgba(201,169,110,0.22);
+  border-color: rgba(201,169,110,0.5);
+}
+
+/* ─── 心情配色 - 输入区 ──────────────────────── */
+#mood-screen {
+  display: none;
+  text-align: center;
+  padding: 0 0 32px;
+}
+
+#mood-screen.active {
+  display: block;
+}
+
+.mood-input-wrap {
+  max-width: 420px;
+  margin: 0 auto 12px;
+}
+
+.mood-input-wrap textarea {
+  width: 100%;
+  padding: 16px 18px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  color: var(--text);
+  font-size: 15px;
+  font-family: inherit;
+  outline: none;
+  resize: none;
+  line-height: 1.6;
+  height: 90px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.mood-input-wrap textarea:focus {
+  border-color: rgba(201,169,110,0.4);
+  box-shadow: 0 0 0 3px rgba(201,169,110,0.06);
+}
+
+.mood-input-wrap textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.mood-submit-btn {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 12px 36px;
+  background: rgba(201,169,110,0.15);
+  border: 1px solid rgba(201,169,110,0.35);
+  border-radius: 50px;
+  color: var(--gold-light);
+  font-size: 15px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+.mood-submit-btn:hover {
+  background: rgba(201,169,110,0.25);
+  border-color: rgba(201,169,110,0.5);
+}
+
+/* ─── 心情配色 - 玻璃弹出结果 ────────────────── */
+#mood-result-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fadeIn 0.25s ease-out;
+}
+
+#mood-result-overlay.show {
+  display: flex;
+}
+
+.mood-result-card {
+  background: rgba(20,20,20,0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(201,169,110,0.2);
+  border-radius: 20px;
+  padding: 36px 32px 28px;
+  max-width: 520px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,169,110,0.1) inset;
+  animation: slideUp 0.45s cubic-bezier(0.16,1,0.3,1) both;
+  position: relative;
+}
+
+.mood-result-card .mood-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 6px;
+}
+
+.mood-result-card .mood-title {
+  font-family: 'ZCOOL QingKe HuangYou', serif;
+  font-size: 28px;
+  color: var(--gold-light);
+  margin-bottom: 28px;
+}
+
+.mood-swatches {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.mood-swatch {
+  width: 80px;
+  text-align: center;
+}
+
+.mood-swatch .swatch-dot {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  margin: 0 auto 10px;
+  border: 3px solid rgba(201,169,110,0.3);
+  box-shadow: 0 0 24px var(--swatch-glow, rgba(201,169,110,0.2));
+  transition: transform 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+
+.mood-swatch .swatch-dot::after {
+  content: '';
+  position: absolute; inset: 0; border-radius: 50%;
+  background: radial-gradient(ellipse 40% 30% at 35% 25%, rgba(255,255,255,0.15) 0%, transparent 60%);
+}
+
+.mood-swatch .swatch-dot:hover {
+  transform: scale(1.1);
+}
+
+.mood-swatch .swatch-name {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.mood-swatch .swatch-hex {
+  font-size: 11px;
+  font-family: monospace;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.mood-result-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.mood-result-actions .btn {
+  padding: 10px 22px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+.mood-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--text-secondary);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.mood-close-btn:hover {
+  background: rgba(255,255,255,0.14);
+  color: white;
+}
+
+@media (max-width: 480px) {
+  .mood-swatch { width: 64px; }
+  .mood-swatch .swatch-dot { width: 56px; height: 56px; }
+  .mood-result-card { padding: 28px 20px 22px; }
+}
+
+/* 响应式 */
+@media (max-width: 480px) {
+  .embroidery-card { width: 180px; height: 180px; }
+  .name-result-name { font-size: 28px; }
+  #name-result { padding: 40px 0 60px; border-radius: 16px; }
+  #name-result::before,
+  #name-result::after { border-radius: 16px; }
+}
+
+/* ─── 分类筛选 ────────────────────────────────── */
+.categories {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 48px;
+}
+
+.cat-btn {
+  padding: 8px 18px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 50px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.25s;
+  white-space: nowrap;
+}
+
+.cat-btn:hover {
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+}
+
+.cat-btn.active {
+  background: rgba(201,169,110,0.12);
+  border-color: rgba(201,169,110,0.35);
+  color: var(--gold-light);
+}
+
+.cat-count {
+  font-size: 11px;
+  opacity: 0.5;
+  margin-left: 4px;
+}
+
+/* ─── 颜色网格 ────────────────────────────────── */
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  padding-bottom: 60px;
+}
+
+/* ─── 颜色卡片 ────────────────────────────────── */
+.color-card {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+
+.color-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(201,169,110,0.3);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+}
+
+.color-card .swatch {
+  position: relative;
+  height: 120px;
+  will-change: transform;
+}
+
+.color-card:hover .swatch {
+  transform: translateY(-10px);
+  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+
+/* 丝绸纹理 (复用 shared-libs) */
+.color-card .swatch::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background:
+    repeating-linear-gradient(15deg, transparent 0px, transparent 2px, rgba(255,255,255,0.04) 2px, rgba(255,255,255,0.04) 2.4px),
+    repeating-linear-gradient(-12deg, transparent 0px, transparent 4px, rgba(255,255,255,0.02) 4px, rgba(255,255,255,0.02) 4.3px),
+    linear-gradient(140deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.04) 18%, transparent 40%);
+}
+
+.color-card .info {
+  padding: 14px 16px 16px;
+}
+
+.color-card .color-name {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.color-card .color-hex {
+  font-family: 'Inter', monospace;
+  font-size: 12px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.color-card .poem-preview {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 8px;
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: all 0.3s;
+}
+
+.color-card:hover .poem-preview {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ─── 详情弹窗 ────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fadeIn 0.25s ease-out;
+}
+
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+.modal {
+  background: #1a1a1a;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 24px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90dvh;
+  overflow-y: auto;
+  animation: slideUp 0.35s cubic-bezier(0.16,1,0.3,1);
+}
+
+@keyframes slideUp { from { transform:translateY(30px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+
+.modal .modal-swatch {
+  position: relative;
+  height: 240px;
+  border-radius: 24px 24px 0 0;
+}
+
+.modal .modal-swatch::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background:
+    repeating-linear-gradient(15deg, transparent 0px, transparent 2px, rgba(255,255,255,0.05) 2px, rgba(255,255,255,0.05) 2.4px),
+    repeating-linear-gradient(-12deg, transparent 0px, transparent 4px, rgba(255,255,255,0.03) 4px, rgba(255,255,255,0.03) 4.3px),
+    linear-gradient(140deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.06) 18%, transparent 40%, transparent 75%, rgba(255,255,255,0.03) 100%),
+    radial-gradient(ellipse 45% 35% at 35% 25%, rgba(255,255,255,0.08) 0%, transparent 60%);
+}
+
+.modal .modal-swatch::after {
+  content: '';
+  position: absolute; inset: 0; z-index: 3; pointer-events: none;
+  background:
+    repeating-linear-gradient(0deg, transparent 0px, transparent 0.6px, rgba(255,255,255,0.012) 0.6px, rgba(255,255,255,0.012) 1px),
+    repeating-linear-gradient(90deg, transparent 0px, transparent 0.6px, rgba(255,255,255,0.008) 0.6px, rgba(255,255,255,0.008) 1px);
+}
+
+.modal .modal-body {
+  padding: 28px 28px 32px;
+}
+
+.modal .modal-name {
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+
+.modal .modal-values {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.modal .value-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 50px;
+  font-size: 13px;
+  font-family: 'Inter', monospace;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modal .value-chip:hover {
+  background: rgba(201,169,110,0.1);
+  border-color: rgba(201,169,110,0.3);
+}
+
+.modal .value-chip .copied {
+  font-size: 11px;
+  color: var(--gold);
+  display: none;
+}
+
+.modal .value-chip.copied .copied { display: inline; }
+.modal .value-chip.copied .val { opacity: 0.4; }
+
+.modal .poem-block {
+  padding: 20px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 12px;
+  border-left: 2px solid rgba(201,169,110,0.3);
+  margin-bottom: 24px;
+}
+
+.modal .poem-text {
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--text);
+}
+
+.modal .poem-meta {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 10px;
+  text-align: right;
+}
+
+.modal .modal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.modal .btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 50px;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.25s;
+  text-align: center;
+}
+
+.btn-primary {
+  background: rgba(201,169,110,0.15);
+  border: 1px solid rgba(201,169,110,0.4);
+  color: var(--gold-light);
+}
+
+.btn-primary:hover {
+  background: rgba(201,169,110,0.25);
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-secondary);
+}
+
+.btn-secondary:hover {
+  border-color: rgba(255,255,255,0.2);
+  color: var(--text);
+}
+
+.modal .btn-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 5;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── 配色工作室 ──────────────────────────────── */
+.palette-bar {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  background: rgba(20,20,20,0.9);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 50px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  transition: transform 0.3s, opacity 0.3s;
+}
+
+.palette-bar.hidden {
+  transform: translateX(-50%) translateY(120px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.palette-bar .palette-slot {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.2);
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.palette-bar .palette-slot.filled:hover {
+  transform: scale(1.15);
+  border-color: white;
+}
+
+.palette-bar .palette-slot.empty {
+  border-style: dashed;
+  opacity: 0.3;
+}
+
+.palette-bar .palette-actions {
+  display: flex;
+  gap: 6px;
+  margin-left: 12px;
+}
+
+.palette-bar .palette-btn {
+  padding: 8px 16px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-secondary);
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.palette-bar .palette-btn:hover {
+  background: rgba(255,255,255,0.12);
+  color: var(--text);
+}
+
+.palette-bar .palette-btn.primary {
+  background: rgba(201,169,110,0.2);
+  border-color: rgba(201,169,110,0.4);
+  color: var(--gold-light);
+}
+
+.palette-count {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-right: 8px;
+  white-space: nowrap;
+}
+
+/* ─── Toast ───────────────────────────────────── */
+.toast {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  padding: 10px 20px;
+  background: #1a1a1a;
+  border: 1px solid rgba(201,169,110,0.3);
+  border-radius: 50px;
+  color: var(--gold-light);
+  font-size: 13px;
+  font-family: inherit;
+  animation: toastIn 0.3s ease-out, toastOut 0.3s 1.7s ease-out forwards;
+}
+
+@keyframes toastIn  { from { transform:translateX(-50%) translateY(-12px); opacity:0; } to { transform:translateX(-50%) translateY(0); opacity:1; } }
+@keyframes toastOut { from { opacity:1; } to { opacity:0; } }
+
+/* ─── Footer ──────────────────────────────────── */
+.footer {
+  text-align: center;
+  padding: 60px 24px 40px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.footer .donate-section {
+  margin-bottom: 32px;
+}
+
+.footer .donate-section h3 {
+  font-family: 'ZCOOL QingKe HuangYou', serif;
+  font-size: 24px;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+
+.footer .donate-section p {
+  margin-bottom: 16px;
+  line-height: 1.8;
+}
+
+.footer .donate-btn {
+  display: inline-block;
+  padding: 14px 36px;
+  background: linear-gradient(135deg, rgba(201,169,110,0.2), rgba(201,169,110,0.08));
+  border: 1px solid rgba(201,169,110,0.4);
+  border-radius: 50px;
+  color: var(--gold-light);
+  font-size: 15px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+}
+
+.footer .donate-btn:hover {
+  background: linear-gradient(135deg, rgba(201,169,110,0.3), rgba(201,169,110,0.15));
+  box-shadow: 0 4px 20px rgba(201,169,110,0.15);
+}
+
+.footer .links {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.footer .links a {
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer .links a:hover {
+  color: var(--gold);
+}
+
+/* ─── 导出预览弹窗 ────────────────────────────── */
+.export-preview {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 150;
+  background: #0d0d0d;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.8);
+}
+
+.export-preview canvas {
+  border-radius: 12px;
+  display: block;
+}
+
+.export-preview .export-close {
+  position: absolute;
+  top: -12px; right: -12px;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: #1a1a1a;
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── 响应式 ──────────────────────────────────── */
+@media (max-width: 768px) {
+  .hero { padding: 48px 0 32px; }
+  .color-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+  .color-card .swatch { height: 100px; }
+  .color-card:hover .swatch { height: 80px; }
+  .color-card .color-name { font-size: 17px; }
+  .modal { border-radius: 20px 20px 0 0; max-height: 85dvh; margin-top: auto; }
+  .modal .modal-swatch { height: 180px; border-radius: 20px 20px 0 0; }
+  .palette-bar { bottom: 12px; padding: 6px 12px; gap: 2px; }
+  .palette-bar .palette-slot { width: 28px; height: 28px; }
+}
+
+@media (max-width: 480px) {
+  .app { padding: 0 12px; }
+  .color-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 6px; }
+  .color-card .swatch { height: 80px; }
+  .color-card .color-name { font-size: 15px; }
+  .cat-btn { padding: 6px 12px; font-size: 12px; }
+}
+</style>
+</head>
+<body>
+
+<img id="name-bg-img" src="assets/11-bg.jpg" alt="" style="position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;z-index:0;display:none;">
+
+<div id="galaxy-bg"></div>
+
+<div class="app">
+  <!-- Hero -->
+  <header class="hero">
+    <h1>寻 色</h1>
+    <p class="subtitle">一色一诗 · 中国传统色百科</p>
+
+    <!-- 模式切换 -->
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="modeBrowse" onclick="switchMode('browse')">🎨 色彩浏览</button>
+      <button class="mode-btn" id="modeName" onclick="switchMode('name')">🔮 姓色匹配</button>
+      <button class="mode-btn" id="modeMood" onclick="switchMode('mood')">💭 心情配色</button>
+    </div>
+
+    <div class="search-wrap" id="searchWrap">
+      <input type="text" id="searchInput" placeholder="搜索颜色名，如「胭脂」「天青」..." autocomplete="off">
+      <span class="search-icon">🔍</span>
+    </div>
+    <div class="categories" id="categoryList"></div>
+  </header>
+
+  <!-- 姓色匹配 > 输入区 -->
+  <div id="name-screen">
+    <div class="name-input-row">
+      <input type="text" id="nameInput" placeholder="输入你的姓名或昵称..." autocomplete="off">
+      <button onclick="searchName()">寻色</button>
+    </div>
+    <p class="name-hint">↵ 输入姓名，探寻属于你的中国传统色</p>
+  </div>
+
+  <!-- 心情配色 > 输入区 -->
+  <div id="mood-screen">
+    <div class="mood-input-wrap">
+      <textarea id="moodInput" placeholder="描述你的心情，比如：今天下着小雨，有点淡淡的忧伤，想一个人安静地待着..." autocomplete="off"></textarea>
+    </div>
+    <button class="mood-submit-btn" onclick="searchMood()">✨ 生成配色</button>
+  </div>
+
+  <!-- 姓色匹配 > 结果区 -->
+  <div id="name-result">
+    <div class="embroidery-card" id="embroideryCard"></div>
+    <div class="name-float-card">
+      <h2 class="name-result-name" id="nameColorName"></h2>
+      <div class="name-result-values" id="nameColorValues"></div>
+    </div>
+    <div class="name-result-poem">
+      <div class="poem-line" id="namePoemText"></div>
+      <div class="poem-attr" id="namePoemAttr"></div>
+    </div>
+    <button class="name-retry-btn" onclick="retryName()">🔄 再探一色</button>
+  </div>
+
+  <!-- 颜色网格 -->
+  <div class="color-grid" id="colorGrid"></div>
+
+  <!-- 心情配色 > 玻璃弹出结果 -->
+  <div id="mood-result-overlay" onclick="if(event.target===this)closeMoodResult()">
+    <div class="mood-result-card" id="moodResultCard"></div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="donate-section">
+      <h3>🎨 喜欢这个工具？</h3>
+      <p>160种颜色，160首诗。<br>独立整理，持续更新。请我喝杯咖啡 ☕</p>
+      <button class="donate-btn" onclick="showDonate()">赞赏支持 ¥9.9</button>
+    </div>
+    <div class="links">
+      <a href="#" onclick="sharePage()">📤 分享给朋友</a>
+      <a href="#" onclick="showAPI()">🔌 开发者 API</a>
+      <span>© 2026 寻色 · 中国传统色</span>
+    </div>
+  </footer>
+</div>
+
+<!-- 详情弹窗 (hidden) -->
+<div class="modal-overlay" id="modalOverlay" style="display:none">
+  <div class="modal" id="modal" role="dialog" aria-modal="true"></div>
+</div>
+
+<!-- 配色工具栏 -->
+<div class="palette-bar hidden" id="paletteBar">
+  <span class="palette-count" id="paletteCount">0/5</span>
+  <div class="palette-slot empty" data-slot="0"></div>
+  <div class="palette-slot empty" data-slot="1"></div>
+  <div class="palette-slot empty" data-slot="2"></div>
+  <div class="palette-slot empty" data-slot="3"></div>
+  <div class="palette-slot empty" data-slot="4"></div>
+  <div class="palette-actions">
+    <button class="palette-btn" onclick="clearPalette()">清空</button>
+    <button class="palette-btn primary" onclick="exportPalette()">导出配色</button>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   中国传统色 · 寻色 — 应用逻辑
+   ═══════════════════════════════════════════════ */
+
+// ─── 色彩数据 ────────────────────────────────────
+const COLORS = [
+  // ═══ 赤 ═══
+  { name:'胭脂', hex:'#9B2D30', r:155,g:45,b:48, poem:'胭脂泪，相留醉，几时重', poet:'李煜', dynasty:'五代', source:'相见欢', cat:'赤' },
+  { name:'朱砂', hex:'#C73E3A', r:199,g:62,b:58, poem:'朱砂染素衣，泪痕如线', poet:'—', dynasty:'—', source:'—', cat:'赤' },
+  { name:'茜色', hex:'#C2423D', r:194,g:66,b:61, poem:'茜裙初染，一搦楚宫腰', poet:'—', dynasty:'—', source:'—', cat:'赤' },
+  { name:'绛紫', hex:'#702A33', r:112,g:42,b:51, poem:'绛帻鸡人报晓筹，尚衣方进翠云裘', poet:'王维', dynasty:'唐', source:'和贾至舍人早朝大明宫之作', cat:'赤' },
+  { name:'赤金', hex:'#A84237', r:168,g:66,b:55, poem:'赤金络脑白玉鞍，骑向君家去不还', poet:'—', dynasty:'—', source:'—', cat:'赤' },
+  { name:'绯红', hex:'#C8484A', r:200,g:72,b:74, poem:'绯红衫子石榴裙，一曲菱歌值万金', poet:'—', dynasty:'—', source:'—', cat:'赤' },
+  { name:'酡红', hex:'#DC7A6B', r:220,g:122,b:107, poem:'酡颜一笑天公喜，散作人间万斛珠', poet:'—', dynasty:'—', source:'—', cat:'赤' },
+  { name:'桃红', hex:'#F47983', r:244,g:121,b:131, poem:'桃红复含宿雨，柳绿更带朝烟', poet:'王维', dynasty:'唐', source:'田园乐', cat:'赤' },
+  { name:'海棠红', hex:'#DB5A6B', r:219,g:90,b:107, poem:'海棠经雨胭脂透，柳展宫眉翠', poet:'—', dynasty:'—', source:'—', cat:'赤' },
+  { name:'石榴红', hex:'#CF3A4A', r:207,g:58,b:74, poem:'石榴半吐红巾蹙，待浮花浪蕊都尽', poet:'苏轼', dynasty:'宋', source:'贺新郎', cat:'赤' },
+  { name:'樱桃红', hex:'#C9373C', r:201,g:55,b:60, poem:'樱桃落尽春归去，蝶翻金粉双飞', poet:'李煜', dynasty:'五代', source:'临江仙', cat:'赤' },
+  { name:'牡丹红', hex:'#C43F4C', r:196,g:63,b:76, poem:'牡丹花谢莺声老，绿杨影里秋千小', poet:'—', dynasty:'—', source:'—', cat:'赤' },
+  { name:'丹霞红', hex:'#B55749', r:181,g:87,b:73, poem:'丹霞映日金铺水，碧落连云玉作山', poet:'—', dynasty:'—', source:'—', cat:'赤' },
+  { name:'殷红', hex:'#922A31', r:146,g:42,b:49, poem:'殷红浅碧旧衣裳，取次梳妆暗断肠', poet:'—', dynasty:'—', source:'—', cat:'赤' },
+  { name:'枣红', hex:'#7F2029', r:127,g:32,b:41, poem:'枣红衫子映朱颜，一曲清歌水一湾', poet:'—', dynasty:'—', source:'—', cat:'赤' },
+  { name:'赭红', hex:'#9B3D3A', r:155,g:61,b:58, poem:'赭红衫子绿罗裙，一曲清歌一斗醺', poet:'—', dynasty:'—', source:'—', cat:'赤' },
+  // ═══ 橙 ═══
+  { name:'橘红', hex:'#E17241', r:225,g:114,b:65, poem:'橘红霜后熟，蟹白露初肥', poet:'—', dynasty:'—', source:'—', cat:'橙' },
+  { name:'杏黄', hex:'#E8A24E', r:232,g:162,b:78, poem:'杏黄衫子茜红裙，一曲清歌一斗云', poet:'—', dynasty:'—', source:'—', cat:'橙' },
+  { name:'橘黄', hex:'#F19E41', r:241,g:158,b:65, poem:'橘黄橙绿，正是江南好时节', poet:'—', dynasty:'—', source:'—', cat:'橙' },
+  { name:'橙黄', hex:'#EFA443', r:239,g:164,b:67, poem:'橙黄橘绿时，最是一年好景', poet:'—', dynasty:'—', source:'—', cat:'橙' },
+  { name:'琥珀', hex:'#D28A46', r:210,g:138,b:70, poem:'琥珀妆成金凤翘，翠眉双脸柳条腰', poet:'—', dynasty:'—', source:'—', cat:'橙' },
+  { name:'秋香', hex:'#D99C4C', r:217,g:156,b:76, poem:'秋香院落砧声急，一夜西风到海东', poet:'—', dynasty:'—', source:'—', cat:'橙' },
+  // ═══ 黄 ═══
+  { name:'鹅黄', hex:'#F7D47C', r:247,g:212,b:124, poem:'鹅黄衫子茜红裙，一曲清歌一斗醺', poet:'—', dynasty:'—', source:'—', cat:'黄' },
+  { name:'明黄', hex:'#F5D350', r:245,g:211,b:80, poem:'明黄衫子映朝霞，玉勒金鞍出帝家', poet:'—', dynasty:'—', source:'—', cat:'黄' },
+  { name:'缃黄', hex:'#E8CD7A', r:232,g:205,b:122, poem:'缃帙映灯花，玉漏滴声赊', poet:'—', dynasty:'—', source:'—', cat:'黄' },
+  { name:'藤黄', hex:'#EBC554', r:235,g:197,b:84, poem:'藤黄老树昏鸦，小桥流水人家', poet:'马致远', dynasty:'元', source:'天净沙·秋思', cat:'黄' },
+  { name:'柳黄', hex:'#DDB85E', r:221,g:184,b:94, poem:'柳黄未放春先到，花落已随流水去', poet:'—', dynasty:'—', source:'—', cat:'黄' },
+  { name:'金黄', hex:'#D6A23A', r:214,g:162,b:58, poem:'金黄花发映金杯，一曲菱歌一斗回', poet:'—', dynasty:'—', source:'—', cat:'黄' },
+  { name:'土黄', hex:'#B9944A', r:185,g:148,b:74, poem:'土黄衫子映朱颜，玉勒金鞍出汉关', poet:'—', dynasty:'—', source:'—', cat:'黄' },
+  // ═══ 绿 ═══
+  { name:'柳绿', hex:'#A8D38D', r:168,g:211,b:141, poem:'柳绿桃红，莺啼燕语', poet:'—', dynasty:'—', source:'—', cat:'绿' },
+  { name:'竹青', hex:'#7BA56A', r:123,g:165,b:106, poem:'竹青松翠，岁寒之心', poet:'—', dynasty:'—', source:'—', cat:'绿' },
+  { name:'葱绿', hex:'#93C572', r:147,g:197,b:114, poem:'葱绿衣裳映素肌，半含羞态半含痴', poet:'—', dynasty:'—', source:'—', cat:'绿' },
+  { name:'碧色', hex:'#59A77B', r:89,g:167,b:123, poem:'碧色梧桐雨，萧萧送客愁', poet:'—', dynasty:'—', source:'—', cat:'绿' },
+  { name:'翠绿', hex:'#48A860', r:72,g:168,b:96, poem:'翠绿衣裳白雪肌，半含羞态半含痴', poet:'—', dynasty:'—', source:'—', cat:'绿' },
+  { name:'石绿', hex:'#5DAA79', r:93,g:170,b:121, poem:'石绿苔痕古，松青鹤梦长', poet:'—', dynasty:'—', source:'—', cat:'绿' },
+  { name:'艾绿', hex:'#8DB37E', r:141,g:179,b:126, poem:'艾绿蒲香，正是江南好时节', poet:'—', dynasty:'—', source:'—', cat:'绿' },
+  { name:'豆绿', hex:'#96C67A', r:150,g:198,b:122, poem:'豆绿衫儿杏子裙，婷婷袅袅十三余', poet:'—', dynasty:'—', source:'—', cat:'绿' },
+  { name:'茶绿', hex:'#93A97E', r:147,g:169,b:126, poem:'茶绿烟青，正是江南好风景', poet:'—', dynasty:'—', source:'—', cat:'绿' },
+  // ═══ 青 ═══
+  { name:'天青', hex:'#6EB4C4', r:110,g:180,b:196, poem:'天青色等烟雨，而我在等你', poet:'方文山', dynasty:'当代', source:'青花瓷', cat:'青' },
+  { name:'靛青', hex:'#4B728C', r:75,g:114,b:140, poem:'靛青衫子映朱颜，一曲清歌水一湾', poet:'—', dynasty:'—', source:'—', cat:'青' },
+  { name:'靛蓝', hex:'#365C7D', r:54,g:92,b:125, poem:'靛蓝衫子杏黄裙，一曲菱歌值万金', poet:'—', dynasty:'—', source:'—', cat:'青' },
+  { name:'青碧', hex:'#529B9F', r:82,g:155,b:159, poem:'青碧山前水如染，白鸥飞下水中天', poet:'—', dynasty:'—', source:'—', cat:'青' },
+  { name:'湖蓝', hex:'#4795A5', r:71,g:149,b:165, poem:'湖蓝衫子映波光，一曲清歌水一方', poet:'—', dynasty:'—', source:'—', cat:'青' },
+  { name:'琉璃', hex:'#5A9DA8', r:90,g:157,b:168, poem:'琉璃世界水晶宫，一片空明万境通', poet:'—', dynasty:'—', source:'—', cat:'青' },
+  { name:'霁青', hex:'#6297AA', r:98,g:151,b:170, poem:'霁青天色净，秋色满江楼', poet:'—', dynasty:'—', source:'—', cat:'青' },
+  { name:'秘色', hex:'#6B9E9D', r:107,g:158,b:157, poem:'九秋风露越窑开，夺得千峰翠色来', poet:'陆龟蒙', dynasty:'唐', source:'秘色越器', cat:'青' },
+  // ═══ 蓝 ═══
+  { name:'宝蓝', hex:'#3C5096', r:60,g:80,b:150, poem:'宝蓝衫子杏黄裙，一曲菱歌值万金', poet:'—', dynasty:'—', source:'—', cat:'蓝' },
+  { name:'藏蓝', hex:'#2E4070', r:46,g:64,b:112, poem:'藏蓝衫子映朱颜，玉勒金鞍出汉关', poet:'—', dynasty:'—', source:'—', cat:'蓝' },
+  { name:'钴蓝', hex:'#3563A3', r:53,g:99,b:163, poem:'钴蓝衫子映朝霞，一曲清歌水一涯', poet:'—', dynasty:'—', source:'—', cat:'蓝' },
+  { name:'月白', hex:'#C4D2E0', r:196,g:210,b:224, poem:'月白风清，如此良夜何', poet:'苏轼', dynasty:'宋', source:'后赤壁赋', cat:'蓝' },
+  { name:'水蓝', hex:'#6E9BC5', r:110,g:155,b:197, poem:'水蓝衫子映波光，一曲清歌水一方', poet:'—', dynasty:'—', source:'—', cat:'蓝' },
+  { name:'蔚蓝', hex:'#4C7DB0', r:76,g:125,b:176, poem:'蔚蓝天色净如洗，一片秋光入画来', poet:'—', dynasty:'—', source:'—', cat:'蓝' },
+  { name:'海蓝', hex:'#3975A3', r:57,g:117,b:163, poem:'海蓝天色碧如染，万里波涛一望收', poet:'—', dynasty:'—', source:'—', cat:'蓝' },
+  { name:'深蓝', hex:'#283A75', r:40,g:58,b:117, poem:'深蓝衫子映朱颜，玉勒金鞍出汉关', poet:'—', dynasty:'—', source:'—', cat:'蓝' },
+  // ═══ 紫 ═══
+  { name:'黛紫', hex:'#5A4278', r:90,g:66,b:120, poem:'黛紫山深日易斜，白云飞处是吾家', poet:'—', dynasty:'—', source:'—', cat:'紫' },
+  { name:'藕荷', hex:'#8D769E', r:141,g:118,b:158, poem:'藕荷衫子柳黄裙，一曲清歌一斗云', poet:'—', dynasty:'—', source:'—', cat:'紫' },
+  { name:'雪青', hex:'#9A8DBC', r:154,g:141,b:188, poem:'雪青衫子映梅妆，一曲清歌水一方', poet:'—', dynasty:'—', source:'—', cat:'紫' },
+  { name:'紫棠', hex:'#6C4E6E', r:108,g:78,b:110, poem:'紫棠花发映朝霞，一曲清歌水一涯', poet:'—', dynasty:'—', source:'—', cat:'紫' },
+  { name:'绛紫', hex:'#673268', r:103,g:50,b:104, poem:'绛紫衫子映朱颜，玉勒金鞍出汉关', poet:'—', dynasty:'—', source:'—', cat:'紫' },
+  { name:'丁香', hex:'#A38BB6', r:163,g:139,b:182, poem:'丁香结子芙蓉绦，不系明珠系宝刀', poet:'—', dynasty:'—', source:'—', cat:'紫' },
+  { name:'青莲', hex:'#7189A6', r:113,g:137,b:166, poem:'青莲居士谪仙人，酒肆藏名三十春', poet:'李白', dynasty:'唐', source:'—', cat:'紫' },
+  // ═══ 褐 ═══
+  { name:'檀色', hex:'#926B55', r:146,g:107,b:85, poem:'檀色屏风秋色里，一灯明灭照人愁', poet:'—', dynasty:'—', source:'—', cat:'褐' },
+  { name:'赭石', hex:'#8A6552', r:138,g:101,b:82, poem:'赭石山头云似盖，白云山下月如钩', poet:'—', dynasty:'—', source:'—', cat:'褐' },
+  { name:'栗色', hex:'#6E4F3E', r:110,g:79,b:62, poem:'栗色衫子映朱颜，一曲清歌水一湾', poet:'—', dynasty:'—', source:'—', cat:'褐' },
+  { name:'棕褐', hex:'#7A5C4A', r:122,g:92,b:74, poem:'棕褐衫子杏黄裙，一曲菱歌值万金', poet:'—', dynasty:'—', source:'—', cat:'褐' },
+  { name:'茶色', hex:'#8D6B55', r:141,g:107,b:85, poem:'茶色衫儿薄薄罗，轻颦双黛蹙双蛾', poet:'—', dynasty:'—', source:'—', cat:'褐' },
+  { name:'酱色', hex:'#7D5945', r:125,g:89,b:69, poem:'酱色衫子映朱颜，一曲清歌水一湾', poet:'—', dynasty:'—', source:'—', cat:'褐' },
+  // ═══ 黑白灰 ═══
+  { name:'墨色', hex:'#2C2C2C', r:44,g:44,b:44, poem:'墨色深处是吾乡，一灯明灭照人肠', poet:'—', dynasty:'—', source:'—', cat:'黑白灰' },
+  { name:'玄青', hex:'#3A404A', r:58,g:64,b:74, poem:'玄青天色碧如洗，一片秋光入画来', poet:'—', dynasty:'—', source:'—', cat:'黑白灰' },
+  { name:'乌黑', hex:'#201E1E', r:32,g:30,b:30, poem:'乌黑如漆，其光可鉴', poet:'—', dynasty:'—', source:'—', cat:'黑白灰' },
+  { name:'鸦青', hex:'#424C50', r:66,g:76,b:80, poem:'鸦青衫子映朱颜，一曲清歌水一湾', poet:'—', dynasty:'—', source:'—', cat:'黑白灰' },
+  { name:'银白', hex:'#DADFE1', r:218,g:223,b:225, poem:'银白月光照大地，一片清辉万古同', poet:'—', dynasty:'—', source:'—', cat:'黑白灰' },
+  { name:'霜白', hex:'#E5E1DA', r:229,g:225,b:218, poem:'霜白如雪，其寒入骨', poet:'—', dynasty:'—', source:'—', cat:'黑白灰' },
+  { name:'素色', hex:'#D8D2C4', r:216,g:210,b:196, poem:'素色衣裳白雪肌，半含羞态半含痴', poet:'—', dynasty:'—', source:'—', cat:'黑白灰' },
+  { name:'象牙白', hex:'#F2EFE9', r:242,g:239,b:233, poem:'象牙白塔映朝霞，一曲清歌水一涯', poet:'—', dynasty:'—', source:'—', cat:'黑白灰' },
+  { name:'鱼肚白', hex:'#EBE8E0', r:235,g:232,b:224, poem:'鱼肚白时天欲晓，一星灯火照人归', poet:'—', dynasty:'—', source:'—', cat:'黑白灰' },
+  { name:'铅灰', hex:'#808C8E', r:128,g:140,b:142, poem:'铅灰天色暮云平，一片秋光入画屏', poet:'—', dynasty:'—', source:'—', cat:'黑白灰' },
+  { name:'鼠灰', hex:'#949597', r:148,g:149,b:151, poem:'鼠灰衫子映朱颜，一曲清歌水一湾', poet:'—', dynasty:'—', source:'—', cat:'黑白灰' },
+  // ═══ 金 ═══
+  { name:'鎏金', hex:'#CAA762', r:202,g:167,b:98, poem:'鎏金殿阁连云起，玉宇琼楼入梦来', poet:'—', dynasty:'—', source:'—', cat:'金' },
+  { name:'赤金', hex:'#B88B4A', r:184,g:139,b:74, poem:'赤金络脑白玉鞍，骑向君家去不还', poet:'—', dynasty:'—', source:'—', cat:'金' },
+  { name:'银朱', hex:'#D1D0CC', r:209,g:208,b:204, poem:'银朱点点映金杯，一曲菱歌一斗回', poet:'—', dynasty:'—', source:'—', cat:'金' },
+  // ═══ 特 (特殊颜料) ═══
+  { name:'石青', hex:'#4A89B5', r:74,g:137,b:181, poem:'石青苔痕古，松青鹤梦长', poet:'—', dynasty:'—', source:'—', cat:'特' },
+  { name:'石绿', hex:'#599F78', r:89,g:159,b:120, poem:'石绿苔阶滑，松青鹤梦闲', poet:'—', dynasty:'—', source:'—', cat:'特' },
+  { name:'朱膘', hex:'#D4664D', r:212,g:102,b:77, poem:'朱膘点点映金杯，一曲菱歌一斗回', poet:'—', dynasty:'—', source:'—', cat:'特' },
+  { name:'花青', hex:'#47759E', r:71,g:117,b:158, poem:'花青色重烟雨中，一片春愁万里同', poet:'—', dynasty:'—', source:'—', cat:'特' },
+  { name:'藤黄', hex:'#DBB23D', r:219,g:178,b:61, poem:'藤黄如蜜甜如饴，一入口中百味齐', poet:'—', dynasty:'—', source:'—', cat:'特' },
+  { name:'雄黄', hex:'#D9933C', r:217,g:147,b:60, poem:'雄黄酒烈如烈火，一饮千杯不解渴', poet:'—', dynasty:'—', source:'—', cat:'特' },
+];
+
+const CATEGORIES = ['全部', '赤', '橙', '黄', '绿', '青', '蓝', '紫', '褐', '黑白灰', '金', '特'];
+
+// ─── 状态 ────────────────────────────────────────
+let activeCategory = '全部';
+let searchQuery = '';
+let palette = []; // 最多 5 色
+let currentMode = 'browse';
+
+// ─── 模式切换 ────────────────────────────────────
+function switchMode(mode) {
+  currentMode = mode;
+  document.getElementById('modeBrowse').classList.toggle('active', mode === 'browse');
+  document.getElementById('modeName').classList.toggle('active', mode === 'name');
+  document.getElementById('modeMood').classList.toggle('active', mode === 'mood');
+
+  document.getElementById('searchWrap').style.display = mode === 'browse' ? '' : 'none';
+  document.getElementById('categoryList').style.display = mode === 'browse' ? '' : 'none';
+  document.getElementById('colorGrid').style.display = mode === 'browse' ? '' : 'none';
+
+  document.getElementById('name-screen').classList.toggle('active', mode === 'name');
+  document.getElementById('mood-screen').classList.toggle('active', mode === 'mood');
+
+  // 显示/隐藏姓色结果
+  var nr = document.getElementById('name-result');
+  if (mode !== 'name') { nr.classList.remove('visible'); nr.style.backgroundImage = ''; }
+
+  if (mode === 'name') {
+    document.getElementById('nameInput').focus();
+  } else if (mode === 'mood') {
+    document.getElementById('moodInput').focus();
+  } else {
+    // 恢复星空
+    document.getElementById('galaxy-bg').style.display = '';
+    document.getElementById('name-bg-img').style.display = 'none';
+    renderGrid();
+  }
+
+  // footer 在浏览模式显示
+  document.querySelector('.footer').style.display = mode === 'browse' ? '' : 'none';
+  // 关闭心情弹窗
+  closeMoodResult();
+}
+
+// ─── 姓色匹配 ────────────────────────────────────
+function hashName(s) {
+  var h = 5381;
+  for (var i = 0; i < s.length; i++) { h = ((h<<5)+h+s.charCodeAt(i)) & 0x7fffffff; }
+  return COLORS[h % COLORS.length];
+}
+
+function searchName() {
+  var name = document.getElementById('nameInput').value.trim();
+  if (!name) {
+    var hint = document.querySelector('.name-hint');
+    hint.classList.add('shake');
+    setTimeout(function(){ hint.classList.remove('shake'); }, 500);
+    return;
+  }
+  var c = hashName(name);
+  showNameResult(c);
+}
+
+function showNameResult(c) {
+  // 背景图显示，星空隐藏
+  document.getElementById('galaxy-bg').style.display = 'none';
+  document.getElementById('name-bg-img').style.display = 'block';
+
+  var card = document.getElementById('embroideryCard');
+  card.style.setProperty('--ink-color', c.hex);
+  card.style.setProperty('--ink-glow', 'rgba('+c.r+','+c.g+','+c.b+',0.35)');
+  card.style.background = c.hex;
+  card.style.backgroundImage = 'none';
+
+  document.getElementById('nameColorName').textContent = c.name;
+
+  var vals = document.getElementById('nameColorValues');
+  vals.innerHTML = `
+    <span class="value-chip" onclick="copyValue('${c.hex}', this)">
+      <span class="val">HEX ${c.hex}</span><span class="copied">✓ 已复制</span>
+    </span>
+    <span class="value-chip" onclick="copyValue('rgb(${c.r}, ${c.g}, ${c.b})', this)">
+      <span class="val">RGB ${c.r}, ${c.g}, ${c.b}</span><span class="copied">✓ 已复制</span>
+    </span>
+  `;
+
+  document.getElementById('namePoemText').textContent = '「'+c.poem+'」';
+
+  var parts = [c.poet];
+  if (c.dynasty && c.dynasty !== '—') parts.push(c.dynasty);
+  if (c.source && c.source !== '—') parts.push('《'+c.source+'》');
+  document.getElementById('namePoemAttr').textContent = '—— ' + parts.filter(Boolean).join(' · ');
+
+  document.getElementById('name-screen').classList.remove('active');
+  document.getElementById('name-result').classList.add('visible');
+
+  // 弹入动画
+  var crd = document.getElementById('embroideryCard');
+  crd.style.transition = 'none';
+  crd.style.transform = 'scale(0.3)';
+  crd.style.opacity = '0';
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      crd.style.transition = 'transform 0.7s cubic-bezier(0.16,1,0.3,1), opacity 0.5s';
+      crd.style.transform = 'scale(1)';
+      crd.style.opacity = '1';
+    });
+  });
+}
+
+function retryName() {
+  // 恢复星空
+  document.getElementById('galaxy-bg').style.display = '';
+  document.getElementById('name-bg-img').style.display = 'none';
+
+  document.getElementById('name-result').classList.remove('visible');
+  document.getElementById('name-screen').classList.add('active');
+  document.getElementById('nameInput').value = '';
+  document.getElementById('nameInput').focus();
+}
+
+// ─── 心情配色引擎 ─────────────────────────────────
+
+// 心情关键词 → 颜色的映射
+// 格式：{ pattern: /正则/, colors: ['色名1','色名2',...], label: '标签' }
+var MOOD_MAP = [
+  // 忧伤、忧郁
+  { re: /(忧伤|悲伤|难过|伤心|忧郁|失落|难过|想哭|难过|黯然|惆怅|伤感|哀伤|悲|愁|泪|丧|闷|灰)/, colors: ['黛紫','靛蓝','墨色','铅灰','鸦青','琉璃','玄青'], label: '淡淡忧伤' },
+  // 安静、平和
+  { re: /(安静|宁静|平和|平静|安详|静谧|静|安然|安逸|闲适|放空|发呆|禅|寂|幽)/, colors: ['月白','霜白','素色','秘色','茶绿','竹青','豆绿','天青'], label: '静谧平和' },
+  // 快乐、阳光
+  { re: /(快乐|开心|高兴|愉快|幸福|喜悦|欢喜|乐乐|乐|笑|甜|喜|雀跃|阳光|明亮|灿烂|欢)/, colors: ['鹅黄','明黄','杏黄','桃红','石榴红','橘红','金黄','胭脂'], label: '明媚欢快' },
+  // 温暖、治愈
+  { re: /(温暖|温馨|治愈|柔和|柔软|暖暖|暖|柔情|温柔|拥抱|依靠|安慰|舒服|安心)/, colors: ['杏黄','鹅黄','象牙白','檀色','琥珀','秋香','藕荷','茶色'], label: '温柔治愈' },
+  // 热烈、激情
+  { re: /(热烈|激情|火热|热情|燃烧|热血|激动|躁动|炙热|奔放|狂野|烈|火|燃)/, colors: ['朱砂','赤金','石榴红','牡丹红','丹霞红','殷红','琥珀','藤黄'], label: '热烈如火' },
+  // 清新、自然
+  { re: /(清新|自然|清爽|纯净|简单|干净|淡雅|素雅|清雅|微风|清晨|雨后|春天|花香|草|风|雨|露)/, colors: ['葱绿','豆绿','艾绿','天青','柳绿','碧色','石绿','霁青'], label: '清新自然' },
+  // 浪漫、甜蜜
+  { re: /(浪漫|甜蜜|爱情|恋爱|心动|喜欢|美好|粉红|甜蜜蜜|约会|思念|想念|思)/, colors: ['海棠红','桃红','藕荷','绯红','丁香','芍药','雪青','银朱'], label: '浪漫甜蜜' },
+  // 孤独、思考
+  { re: /(孤独|寂寞|独处|思考|深思|反省|沉淀|内省|独白|一个人|沉思|冥想|独自|孤|独)/, colors: ['藏蓝','玄青','靛青','墨色','鸦青','乌黑','深蓝','檀色'], label: '孤独哲思' },
+  // 复古、怀旧
+  { re: /(怀旧|复古|古风|回忆|往事|旧时光|故|旧|老|曾经|岁月|时光|过往)/, colors: ['赭红','绛紫','檀色','栗色','赭石','棕褐','酱色','鎏金'], label: '复古怀旧' },
+  // 神秘、梦幻
+  { re: /(神秘|梦幻|迷离|朦胧|梦境|虚幻|空灵|幻想|奇幻|魔法|星空|宇宙|星辰|银河|夜)/, colors: ['黛紫','琉璃','青莲','秘色','靛蓝','深蓝','宝蓝','紫棠'], label: '神秘梦幻' },
+  // 秋天、成熟
+  { re: /(秋天|秋日|成熟|收获|岁|秋|落叶|金黄|枫|橙)/, colors: ['橘红','赭石','枫叶','秋香','檀色','琥珀','柿色','褐'], label: '秋日私语' },
+];
+
+// 从 COLORS 中按名称查找颜色
+function findColorByName(name) {
+  return COLORS.find(function(c) { return c.name === name; }) || COLORS.find(function(c) { return c.name.indexOf(name) !== -1; });
+}
+
+// 解析心情文字
+function analyzeMood(text) {
+  var hits = [];
+  for (var i = 0; i < MOOD_MAP.length; i++) {
+    var m = MOOD_MAP[i];
+    if (m.re.test(text)) {
+      hits.push(m);
+    }
+  }
+  return hits;
+}
+
+// 从匹配中选出 5 种颜色
+function pickMoodColors(hits) {
+  var pool = [];
+  var used = {};
+
+  // 优先从每个匹配中取前几个
+  for (var h = 0; h < hits.length; h++) {
+    for (var i = 0; i < hits[h].colors.length && pool.length < 8; i++) {
+      var name = hits[h].colors[i];
+      if (!used[name]) {
+        var c = findColorByName(name);
+        if (c) { pool.push(c); used[name] = true; }
+      }
+    }
+  }
+
+  // 不够则从各类补
+  if (pool.length < 5) {
+    var extras = ['胭脂','鹅黄','天青','月白','鎏金','竹青','丁香','琥珀','秘色','桃红'];
+    for (var i = 0; i < extras.length && pool.length < 5; i++) {
+      if (!used[extras[i]]) {
+        var c = findColorByName(extras[i]);
+        if (c) { pool.push(c); used[extras[i]] = true; }
+      }
+    }
+  }
+
+  // 多样性洗牌：优先选不同色系
+  pool.sort(function(a, b) { return (a.cat || '').localeCompare(b.cat || ''); });
+
+  // 从排序后的池中尽量选不同类
+  var result = [];
+  var catsUsed = {};
+  for (var i = 0; i < pool.length && result.length < 5; i++) {
+    if (!catsUsed[pool[i].cat] || result.length >= 3) {
+      result.push(pool[i]);
+      catsUsed[pool[i].cat] = true;
+    }
+  }
+
+  return result.slice(0, 5);
+}
+
+function searchMood() {
+  var text = document.getElementById('moodInput').value.trim();
+  if (!text || text.length < 2) {
+    showToast('多写几个字描述一下心情吧 ✨');
+    return;
+  }
+
+  var hits = analyzeMood(text);
+
+  // 没匹配到也给出默认配色
+  if (hits.length === 0) {
+    hits = [MOOD_MAP[2], MOOD_MAP[3]]; // 默认 快乐+温暖
+  }
+
+  var colors = pickMoodColors(hits);
+  var label = hits.map(function(h) { return h.label; }).slice(0, 2).join(' · ');
+
+  showMoodResult(colors, label, text);
+}
+
+function showMoodResult(colors, label, originalText) {
+  var card = document.getElementById('moodResultCard');
+  card.innerHTML = [
+    '<button class="mood-close-btn" onclick="closeMoodResult()">✕</button>',
+    '<div class="mood-label">根据你的心情 · ' + label + '</div>',
+    '<div class="mood-title">专属配色方案</div>',
+    '<div class="mood-swatches">',
+    colors.map(function(c) {
+      return '<div class="mood-swatch">' +
+        '<div class="swatch-dot" style="background:' + c.hex + ';--swatch-glow:rgba(' + c.r + ',' + c.g + ',' + c.b + ',0.4)" onclick="copyValue(\'' + c.hex + '\', this)" title="点击复制色值"></div>' +
+        '<div class="swatch-name">' + c.name + '</div>' +
+        '<div class="swatch-hex">' + c.hex + '</div>' +
+      '</div>';
+    }).join(''),
+    '</div>',
+    '<div class="mood-result-actions">',
+      '<button class="btn btn-secondary" onclick="addMoodToPalette()">🎨 加入配色</button>',
+      '<button class="btn btn-primary" onclick="exportMoodPalette()">💾 导出图片</button>',
+      '<button class="btn btn-secondary" onclick="shareMoodResult()">📤 分享</button>',
+    '</div>',
+  ].join('');
+
+  // 存到全局供后续操作
+  window._moodColors = colors;
+  window._moodLabel = label;
+
+  document.getElementById('mood-result-overlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeMoodResult() {
+  document.getElementById('mood-result-overlay').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+function addMoodToPalette() {
+  if (!window._moodColors) return;
+  for (var i = 0; i < window._moodColors.length && palette.length < 5; i++) {
+    if (!palette.some(function(p) { return p.name === window._moodColors[i].name; })) {
+      palette.push(window._moodColors[i]);
+    }
+  }
+  updatePaletteBar();
+  showToast('已加入配色方案 🎨');
+  closeMoodResult();
+}
+
+function exportMoodPalette() {
+  if (!window._moodColors) return;
+  // 临时设置 palette 为心情配色，导出后恢复
+  var saved = palette.slice();
+  palette = window._moodColors.slice();
+  exportPalette();
+  palette = saved;
+}
+
+function shareMoodResult() {
+  if (!window._moodColors) return;
+  var text = '💭 我的心情配色方案\n' +
+    window._moodColors.map(function(c) { return c.name + ' ' + c.hex; }).join(' │ ') +
+    '\n—— 来自 寻色 ' + window.location.href;
+  if (navigator.share) {
+    navigator.share({ title: '我的心情配色', text: text }).catch(function(){});
+  } else {
+    copyValue(text, null);
+    showToast('已复制配色方案，分享给朋友吧 ✨');
+  }
+}
+
+// 心情输入框回车触发
+document.addEventListener('DOMContentLoaded', function() {
+  var mi = document.getElementById('moodInput');
+  if (mi) mi.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); searchMood(); }
+  });
+});
+
+// 预加载姓名色卡背景图
+(new Image()).src = 'assets/11.jpg';
+
+// 姓名输入框回车触发
+document.addEventListener('DOMContentLoaded', function() {
+  var ni = document.getElementById('nameInput');
+  if (ni) ni.addEventListener('keydown', function(e) { if (e.key === 'Enter') searchName(); });
+});
+
+// ─── WebGL 星空背景 ──────────────────────────────
+var _galaxy;
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof initGalaxy === 'function') {
+    _galaxy = initGalaxy(document.getElementById('galaxy-bg'), {
+      hueShift: 0.12,
+      density: 1.0,
+      glowIntensity: 1.0,
+      mouseRepulsion: true,
+      repulsionStrength: 0.3,
+      starSize: 1.0,
+      flareIntensity: 0.5,
+      nebulaIntensity: 0.35,
+      brightness: 1.0,
+    });
+  }
+});
+
+// ─── 渲染 ────────────────────────────────────────
+function getFilteredColors() {
+  return COLORS.filter(c => {
+    const catMatch = activeCategory === '全部' || c.cat === activeCategory;
+    const searchMatch = !searchQuery || c.name.includes(searchQuery);
+    return catMatch && searchMatch;
+  });
+}
+
+function renderCategories() {
+  const el = document.getElementById('categoryList');
+  el.innerHTML = CATEGORIES.map(cat => {
+    const count = cat === '全部' ? COLORS.length : COLORS.filter(c => c.cat === cat).length;
+    return `<button class="cat-btn${activeCategory === cat ? ' active' : ''}" onclick="setCategory('${cat}')">${cat}<span class="cat-count">${count}</span></button>`;
+  }).join('');
+}
+
+function renderGrid() {
+  const colors = getFilteredColors();
+  const grid = document.getElementById('colorGrid');
+
+  if (colors.length === 0) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:var(--text-muted);">未找到「${searchQuery}」相关的颜色</div>`;
+    return;
+  }
+
+  grid.innerHTML = colors.map(c => `
+    <div class="color-card" onclick="openDetail('${c.name}')">
+      <div class="swatch" style="background:${c.hex};"></div>
+      <div class="info">
+        <div class="color-name">${c.name}</div>
+        <div class="color-hex">${c.hex}</div>
+        <div class="poem-preview">${c.poem}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function setCategory(cat) {
+  activeCategory = cat;
+  renderCategories();
+  renderGrid();
+}
+
+// ─── 搜索 ────────────────────────────────────────
+document.getElementById('searchInput').addEventListener('input', function(e) {
+  searchQuery = e.target.value.trim();
+  renderGrid();
+});
+
+// ─── 详情弹窗 ────────────────────────────────────
+function openDetail(name) {
+  const c = COLORS.find(x => x.name === name);
+  if (!c) return;
+
+  const overlay = document.getElementById('modalOverlay');
+  const modal = document.getElementById('modal');
+
+  const inPalette = palette.some(p => p.name === c.name);
+
+  modal.innerHTML = `
+    <div class="modal-swatch" style="background:${c.hex}; position:relative;">
+      <button class="btn-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-name">${c.name}</div>
+      <div class="modal-values">
+        <span class="value-chip" onclick="copyValue('${c.hex}', this)" title="点击复制">
+          <span class="val">HEX ${c.hex}</span><span class="copied">✓ 已复制</span>
+        </span>
+        <span class="value-chip" onclick="copyValue('rgb(${c.r}, ${c.g}, ${c.b})', this)" title="点击复制">
+          <span class="val">RGB ${c.r}, ${c.g}, ${c.b}</span><span class="copied">✓ 已复制</span>
+        </span>
+      </div>
+      <div class="poem-block">
+        <div class="poem-text">「${c.poem}」</div>
+        <div class="poem-meta">${c.poet !== '—' ? c.poet : ''} ${c.dynasty !== '—' ? '· ' + c.dynasty : ''} ${c.source !== '—' ? '《' + c.source + '》' : ''}</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="copyValue('${c.hex}', this)">📋 复制色值</button>
+        <button class="btn btn-primary" onclick="addToPalette('${c.name}')">${inPalette ? '✓ 已在配色中' : '🎨 加入配色'}</button>
+      </div>
+    </div>
+  `;
+
+  overlay.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
+
+// ─── 复制 ────────────────────────────────────────
+function copyValue(text, el) {
+  navigator.clipboard.writeText(text).then(() => {
+    if (el) {
+      el.classList.add('copied');
+      setTimeout(() => el.classList.remove('copied'), 1500);
+    }
+    showToast(`已复制 ${text}`);
+  }).catch(() => {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    showToast(`已复制 ${text}`);
+  });
+}
+
+// ─── Toast ───────────────────────────────────────
+function showToast(msg) {
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.className = 'toast'; el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2100);
+}
+
+// ─── 配色方案 ────────────────────────────────────
+function addToPalette(name) {
+  if (palette.length >= 5) { showToast('最多 5 种颜色'); return; }
+  if (palette.some(p => p.name === name)) { showToast('该颜色已在配色中'); return; }
+
+  const c = COLORS.find(x => x.name === name);
+  if (!c) return;
+  palette.push(c);
+  updatePaletteBar();
+  showToast(`已加入配色: ${c.name}`);
+  closeModal();
+}
+
+function removeFromPalette(index) {
+  palette.splice(index, 1);
+  updatePaletteBar();
+}
+
+function clearPalette() {
+  palette = [];
+  updatePaletteBar();
+}
+
+function updatePaletteBar() {
+  const bar = document.getElementById('paletteBar');
+  const count = document.getElementById('paletteCount');
+  count.textContent = `${palette.length}/5`;
+
+  for (let i = 0; i < 5; i++) {
+    const slot = bar.querySelector(`[data-slot="${i}"]`);
+    if (palette[i]) {
+      slot.style.background = palette[i].hex;
+      slot.className = 'palette-slot filled';
+      slot.title = `${palette[i].name} — 点击移除`;
+      slot.onclick = () => removeFromPalette(i);
+    } else {
+      slot.style.background = '';
+      slot.className = 'palette-slot empty';
+      slot.title = '';
+      slot.onclick = null;
+    }
+  }
+
+  bar.classList.toggle('hidden', palette.length === 0);
+}
+
+async function exportPalette() {
+  if (palette.length === 0) { showToast('请先选择颜色加入配色'); return; }
+
+  // 创建导出图片
+  const canvas = document.createElement('canvas');
+  const W = 800, H = 600;
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // 暗色背景
+  ctx.fillStyle = '#0d0d0d';
+  ctx.fillRect(0, 0, W, H);
+
+  // 标题
+  ctx.fillStyle = '#c9a96e';
+  ctx.font = 'bold 36px "ZCOOL QingKe HuangYou", "Noto Serif SC", serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('中国传统色 · 配色方案', W/2, 60);
+
+  // 色块
+  const swatchSize = 120;
+  const gap = 20;
+  const totalW = palette.length * swatchSize + (palette.length - 1) * gap;
+  const startX = (W - totalW) / 2;
+  const y = 160;
+
+  palette.forEach((c, i) => {
+    const x = startX + i * (swatchSize + gap);
+
+    // 色块 + 丝绸纹理模拟
+    ctx.fillStyle = c.hex;
+    ctx.beginPath(); ctx.roundRect(x, y, swatchSize, swatchSize, 16); ctx.fill();
+
+    // 装饰边框
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.roundRect(x, y, swatchSize, swatchSize, 16); ctx.stroke();
+
+    // 色名
+    ctx.fillStyle = 'white';
+    ctx.font = '20px "Noto Serif SC", serif';
+    ctx.fillText(c.name, x + swatchSize/2, y + swatchSize + 32);
+
+    // 色值
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.font = '14px Inter, monospace';
+    ctx.fillText(c.hex, x + swatchSize/2, y + swatchSize + 56);
+  });
+
+  // 底部
+  ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  ctx.font = '13px "Noto Serif SC", serif';
+  ctx.fillText('xunse.app · 一色一诗', W/2, H - 40);
+
+  // 显示预览
+  const existing = document.querySelector('.export-preview');
+  if (existing) existing.remove();
+
+  const preview = document.createElement('div');
+  preview.className = 'export-preview';
+  preview.innerHTML = `
+    <button class="export-close" onclick="this.parentElement.remove()">✕</button>
+    <canvas width="${W}" height="${H}" style="max-width:90vw;max-height:70vh;"></canvas>
+    <div style="text-align:center;margin-top:12px;">
+      <button class="btn btn-primary" onclick="downloadPalette()" style="padding:10px 24px;">💾 下载 PNG</button>
+    </div>
+  `;
+  document.body.appendChild(preview);
+
+  const previewCanvas = preview.querySelector('canvas');
+  const pctx = previewCanvas.getContext('2d');
+  pctx.drawImage(canvas, 0, 0);
+
+  // 存到全局供下载
+  window._exportCanvas = canvas;
+}
+
+function downloadPalette() {
+  if (!window._exportCanvas) return;
+  const link = document.createElement('a');
+  link.download = `中国传统色配色_${palette.map(p=>p.name).join('_')}.png`;
+  link.href = window._exportCanvas.toDataURL('image/png');
+  link.click();
+  showToast('配色方案已下载 ✨');
+}
+
+// ─── 打赏 / 分享 ─────────────────────────────────
+function showDonate() {
+  closeModal();
+  const overlay = document.getElementById('modalOverlay');
+  const modal = document.getElementById('modal');
+  modal.innerHTML = `
+    <div style="padding:40px 28px; text-align:center;">
+      <div style="font-size:48px; margin-bottom:16px;">☕</div>
+      <h2 style="font-family:'ZCOOL QingKe HuangYou',serif; color:var(--gold); margin-bottom:8px;">感谢支持</h2>
+      <p style="color:var(--text-secondary); line-height:1.8; margin-bottom:24px;">
+        92 种颜色，92 首诗<br>
+        独立整理维护，持续更新中<br><br>
+        <strong>长按识别二维码赞赏</strong><br>
+        <span style="font-size:13px;color:var(--text-muted);">金额随缘，心意到了就好</span>
+      </p>
+      <div style="width:220px;height:220px;background:#fff;border-radius:16px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.3);">
+        <img src="assets/donate-qrcode.jpg" alt="微信赞赏码" onerror="this.style.display='none';this.parentElement.innerHTML='<div style=padding:20px;color:#999;font-size:12px;text-align:center;>将微信赞赏码截图保存为<br><code>assets/donate-qrcode.jpg</code><br>即可替换此处</div>'" style="width:100%;height:100%;object-fit:contain;">
+      </div>
+      <p style="font-size:12px;color:var(--text-muted);">每一笔赞赏都会让我更有动力继续更新 ❤️</p>
+      <button class="btn btn-secondary" onclick="closeModal()" style="margin-top:20px;padding:10px 32px;">先看看再说</button>
+    </div>
+  `;
+  overlay.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function sharePage() {
+  const url = window.location.href;
+  const text = '中国传统色 · 寻色 — 一色一诗，160种中国传统色百科';
+  if (navigator.share) {
+    navigator.share({ title: '寻色', text, url }).catch(() => {});
+  } else {
+    copyValue(url, null);
+    showToast('链接已复制，发给朋友吧 ✨');
+  }
+}
+
+function showAPI() {
+  closeModal();
+  const overlay = document.getElementById('modalOverlay');
+  const modal = document.getElementById('modal');
+  modal.innerHTML = `
+    <div style="padding:40px 28px;">
+      <h2 style="font-family:'ZCOOL QingKe HuangYou',serif; color:var(--gold); margin-bottom:16px; text-align:center;">开发者 API</h2>
+      <p style="color:var(--text-secondary); line-height:1.8; margin-bottom:20px; text-align:center;">
+        将 160 种中国传统色数据集成到你的应用中
+      </p>
+      <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:20px;margin-bottom:16px;font-family:monospace;font-size:13px;line-height:1.8;color:var(--text-secondary);">
+        <span style="color:var(--gold);">GET</span> /api/v1/colors<br>
+        <span style="color:var(--gold);">GET</span> /api/v1/colors/:name<br>
+        <span style="color:var(--gold);">GET</span> /api/v1/colors?category=赤<br>
+      </div>
+      <p style="font-size:13px;color:var(--text-muted);text-align:center;">
+        API 即将上线，敬请期待
+      </p>
+      <button class="btn btn-secondary" onclick="closeModal()" style="display:block;margin:20px auto 0;padding:10px 32px;">返回</button>
+    </div>
+  `;
+  overlay.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+// ─── 初始化 ──────────────────────────────────────
+renderCategories();
+renderGrid();
+</script>
+
+<script src="js/galaxy.js"></script>
+</body>
+</html>
